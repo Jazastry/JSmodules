@@ -1,4 +1,5 @@
 var app = app || {};
+app.modules = {};
 
 app.guid = function guid() {
     function s4() {
@@ -10,48 +11,69 @@ app.guid = function guid() {
 };
 
 app.loadModule = function(modulePath, callback) {
-
+    // load module css
     $("<link/>", {
         rel: "stylesheet",
         type: "text/css",
         href: modulePath + 'style.css'
     }).appendTo("head");
 
-    $.get(modulePath + 'main.js', function(data) {
+    // load module js
+    if (!$('script[src="' + modulePath + 'main.js"]').length) {
         $('body').append('<script type="text/javascript" src="' + modulePath + 'main.js"></script>');
+    }
 
-        var htmlData = '';
-        $.get(modulePath + 'index.html', function(data) {
-            htmlData = data;
-            callback(htmlData);
-        });
-
-
+    // load module html
+    var htmlData = '';
+    $.get(modulePath + 'index.html', function(data) {
+        htmlData = data;
+        callback(htmlData);
     });
 };
 
-var modules = $('div[module]');
+app.renderModule = function(moduleName) {
+    app.loadModule('./modules/' + moduleName + '/', function(htmlData) {
+        $('div[module="' + moduleName + '"]').each(function() {
+            if (!$(this).html()) {
+                var guid = app.guid();
+                var module = {};
 
+                switch (moduleName) {
+                    case 'hello':
+                        module = new HelloModule(guid);
+                        break;
+                    case 'broadcast':
+                        module = new BroadcastModule(guid);
+                        break;
+                    case 'interactive':
+                        module = new InteractiveModule(guid);
+                        break;
+                    case 'tabs':
+                        module = new TabsModule(guid);
+                        break;
+                }
+
+                app.modules[guid] = module;
+
+                // attach guid to module container
+                var helloHtml = $(htmlData).attr('guid', guid);
+                $(this).append(helloHtml);
+            }
+        });
+
+        console.log('app.modules', app.modules);
+    });
+};
+
+var modules = $('div[module]').not('div[module]>div[module]');
+console.log('modules ', modules);
 
 for (var i = 0; i < modules.length; i++) {
     var type = $(modules[i]).attr('module');
 
-    if (type !== 'tabs') {
-
+    if (type !== 'tabs' && !$(modules[i]).html()) {
+        console.log('$(modules[i]).html() - type \n', $(modules[i]).html());
+        app.renderModule(type);
     }
 
 }
-
-app.loadModule('./modules/hello/', function(htmlData) {
-
-    // app.modules = {};
-    var mod = new HelloModule(123);
-    console.log('mod ', mod);
-
-    $('div[module="hello"]').each(function() {
-        var guid = app.guid();
-        var helloHtml = $(htmlData).attr('guid', guid);
-        $(this).append(helloHtml);
-
-    });
-});
