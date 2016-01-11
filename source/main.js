@@ -48,8 +48,9 @@ var Module = (function() {
     Module.prototype.remove = function() {
         var _this = this;
         $(_this.parentElement).html('');
-
-        console.log('app.modules ' , app.modules);
+        $(_this.parentElement).children('div[module]').not('div[module="tabs"]').html('');
+        app.modules[_this.guid] = null;
+        delete app.modules[_this.guid];
     };
 
     return Module;

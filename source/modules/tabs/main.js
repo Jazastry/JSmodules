@@ -69,8 +69,16 @@ var TabsModule = (function() {
         var _this = this;
 
         var module = app.moduleFactory(_this.tabChildren[_this.activeTabIndex]);
-        console.log('module ' , module);
+
         _this.currentTabModule = module;
+    };
+
+    TabsModule.prototype.remove = function() {
+        var _this = this;
+        $(_this.parentElement).find('.tab_labels_container').remove();
+        $(_this.parentElement).children('div[module]').not('div[module="tabs"]').html('');
+        app.modules[_this.guid] = null;
+        delete app.modules[_this.guid];
     };
 
     return TabsModule;
