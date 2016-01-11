@@ -1,16 +1,10 @@
 var InteractiveModule = (function() {
-	function InteractiveModule () {
-		this.gui = app.guid();
-		this.properties = {
-			'name': 'Interactive',
-			'label': 'IA'			
-		};
+	function InteractiveModule (parentElement) {
+		Module.call(this, parentElement);
 	}
 
-	InteractiveModule.prototype.getProperties = function() {
-		var _this = this;
-		return _this.properties;
-	};
+	// extend base Module function
+	InteractiveModule.prototype = $.extend( true, InteractiveModule.prototype, Module.prototype);
 
 	return InteractiveModule;
 }());

@@ -1,16 +1,10 @@
 var HelloModule = (function() {
-	function HelloModule (guid) {
-		this.gui = guid;
-		this.properties = {
-			'name': 'Hello',
-			'label': 'HL'			
-		};
+	function HelloModule (parentElement) {
+		Module.call(this, parentElement);
 	}
 
-	HelloModule.prototype.getProperties = function() {
-		var _this = this;
-		return _this.properties;
-	};
+	// extend base Module function
+	HelloModule.prototype = $.extend( true, InteractiveModule.prototype, Module.prototype);
 
 	return HelloModule;
 }());

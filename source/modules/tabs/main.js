@@ -1,17 +1,77 @@
-var TabsModule = (function(){
-	function TabsModule (tabsArray) {
-		this.guid = app.guid();
-		this.tabs = tabsArray;
-		this.properties = {
-			'name': 'Tabs',
-			'label': 'TB'			
-		};
-	}
+var TabsModule = (function() {
+    function TabsModule(parentElement) {
+        this.currentTabModule = {};
+        this.activeTabIndex = 0;
+        this.tabChildren = $(parentElement).children('div[module]');
+        Module.call(this, parentElement);
+    }
 
-	BroadcastModule.prototype.getProperties = function() {
-		var _this = this;
-		return _this.properties;
-	};
+    // extend base Module function
+    TabsModule.prototype = $.extend(true, TabsModule.prototype, Module.prototype);
 
-	return TabsModule;
+    // override render function
+    TabsModule.prototype.render = function() {
+        var _this = this;
+
+        // load module
+        $.get(_this.path + 'index.html', function(htmlData) {
+            _this.tabLabelContainer = $(htmlData).children('.tab_labels_container').clone();
+            _this.createTabChildren();
+            _this.createTabLabels();
+            _this.currentTabModule.render();
+            $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').addClass('active');
+            $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').addClass('active');
+        });
+    };
+
+    TabsModule.prototype.createTabLabels = function() {
+        var _this = this;
+
+        $(_this.tabLabelContainer).attr('guid', _this.guid);
+
+        var tabs = _this.tabChildren;
+        var label = $(_this.tabLabelContainer).children('.tab_label');
+        var labelContainer = $(_this.tabLabelContainer);
+        $(labelContainer).html('');
+
+        for (var i = 0; i < tabs.length; i++) {
+            var tabName = $(tabs[i]).attr('module');
+            var newLabel = $(label).clone();
+            $(newLabel).html(tabName)
+                .attr('moduleIndex', i);
+            $(labelContainer).append(newLabel);
+        }
+
+        $(labelContainer).find('.tab_label').on('click', function(e) {
+            _this.changeTab(this);
+        });
+
+        $(_this.parentElement).prepend(labelContainer);
+    };
+
+    TabsModule.prototype.changeTab = function(label) {
+        var _this = this;
+        
+        $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').removeClass('active');
+        $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').removeClass('active');
+        _this.currentTabModule.remove();
+
+
+        _this.activeTabIndex = $(label).attr('moduleindex');
+        _this.createTabChildren();
+        _this.currentTabModule.render();
+        $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').addClass('active');
+        $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').addClass('active');
+
+    };
+
+    TabsModule.prototype.createTabChildren = function() {
+        var _this = this;
+
+        var module = app.moduleFactory(_this.tabChildren[_this.activeTabIndex]);
+        console.log('module ' , module);
+        _this.currentTabModule = module;
+    };
+
+    return TabsModule;
 }());

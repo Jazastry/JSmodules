@@ -4,21 +4,27 @@
         <meta charset="utf-8">
         <meta name="description" content="">
         <meta name="viewport" content="width=device-width, initial-scale=1">
-        <title>Untitled</title>
+        <title>JS modules</title>
         <link rel="stylesheet" href="style.css">
         <link rel="author" href="humans.txt">
         <script src="./lib/node_modules/jquery/dist/jquery.js"></script>
     </head>
     <body>
-        <div module="interactive"></div>
-    	<div module="tabs">
-            <div module="broadcast"></div>
-            <div module="hello"></div>
-            <div module="tabs">
-                <div module="broadcast"></div>
+    <div class="container">
+        <div module="interactive" class="interactive_module bordered_box col-xl-12"></div>
+    	<div module="tabs" class="tabs_container col-xl-12">
+            <div module="monitoring" class="tab"></div>
+            <div module="hello" class="tab"></div>
+            <div module="tabs" class="tabs_container col-xl-12">
+                <div module="monitoring"></div>
                 <div module="hello"></div>
+                <div module="tabs" class="tabs_container col-xl-12">
+                    <div module="monitoring"></div>
+                    <div module="hello"></div>
+                </div>
             </div>         
-        </div>        
+        </div>
+    </div>
         <script src="main.js"></script>
     </body>
 </html>
