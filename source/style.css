@@ -26,3 +26,61 @@ body {
     border-radius: 6px;
     padding-left: 5px;
 }
+
+.module_container {
+    padding: 20px;
+}
+
+/* tabs */
+.tabs_container {
+    position: relative;
+    padding-top: 20px;
+}
+
+.tabs_container > .tab_labels_container {
+    position: absolute;
+    height: 30px;
+    top: -6px;
+    left: 20px;
+    z-index: 3;
+}
+
+.tabs_container > .tab_labels_container > .tab_label {
+    display: inline-block;
+    width: 100px;
+    height: 28px;
+    line-height: 23px;
+    border: 2px solid #FFF;
+    border-top-left-radius: 7px;
+    border-top-right-radius: 7px;
+    text-align: center;
+    background-color: #000;
+}
+
+.tabs_container > .tab_labels_container > .tab_label:hover {
+    cursor: pointer;
+}
+
+.tabs_container > .tab_labels_container > .tab_label.active {
+    border-bottom: 2px solid #000;
+}
+
+.tabs_container > .tab {
+    display: none;
+}
+
+.tabs_container > .tab.active {
+    display: block;
+}
+
+.tabs_container > .tab {
+    width: 100%;
+    border: 2px solid #FFF;
+    border-radius: 7px;
+    background-color: #000;
+}
+
+/* interactive_module */
+.interactive_module {
+    margin-bottom: 20px;
+}

@@ -1,10 +1,10 @@
 var MonitoringModule = (function() {
 	function MonitoringModule (parentElement) {
-		Module.call(this, parentElement);
+		BroadcastModule.call(this, parentElement);
 	}
 
-	// extend base Module function
-	MonitoringModule.prototype = $.extend( true, MonitoringModule.prototype, Module.prototype);
+	// extend base Module prototype
+	MonitoringModule.prototype = $.extend( true, MonitoringModule.prototype, BroadcastModule.prototype);
 
 	return MonitoringModule;
 }());

@@ -1,24 +1,27 @@
 var TabsModule = (function() {
     function TabsModule(parentElement) {
+        Module.call(this, parentElement);
+
         this.currentTabModule = {};
         this.activeTabIndex = 0;
         this.tabChildren = $(parentElement).children('div[module]');
-        Module.call(this, parentElement);
+        this.render();
     }
 
-    // extend base Module function
+    // extend base Module prototype
     TabsModule.prototype = $.extend(true, TabsModule.prototype, Module.prototype);
 
-    // override render function
+    // override Module render function
     TabsModule.prototype.render = function() {
         var _this = this;
 
-        // load module
-        $.get(_this.path + 'index.html', function(htmlData) {
-            _this.tabLabelContainer = $(htmlData).children('.tab_labels_container').clone();
+        // load module HTML
+        $.get(_this.path + 'index.html', function(moduleHtml) {
+            _this.tabLabelContainer = $(moduleHtml).children('.tab_labels_container').clone();
+            
             _this.createTabChildren();
             _this.createTabLabels();
-            _this.currentTabModule.render();
+
             $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').addClass('active');
             $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').addClass('active');
         });
@@ -27,10 +30,11 @@ var TabsModule = (function() {
     TabsModule.prototype.createTabLabels = function() {
         var _this = this;
 
+        // add parent tab-container guid to parent labels-container
         $(_this.tabLabelContainer).attr('guid', _this.guid);
 
         var tabs = _this.tabChildren;
-        var label = $(_this.tabLabelContainer).children('.tab_label');
+        var label = $(_this.tabLabelContainer).children('.tab_label').clone();
         var labelContainer = $(_this.tabLabelContainer);
         $(labelContainer).html('');
 
@@ -42,6 +46,7 @@ var TabsModule = (function() {
             $(labelContainer).append(newLabel);
         }
 
+        // add change tab on click function
         $(labelContainer).find('.tab_label').on('click', function(e) {
             _this.changeTab(this);
         });
@@ -49,36 +54,55 @@ var TabsModule = (function() {
         $(_this.parentElement).prepend(labelContainer);
     };
 
+    // called on label click
     TabsModule.prototype.changeTab = function(label) {
         var _this = this;
-        
-        $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').removeClass('active');
-        $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').removeClass('active');
+
+        // remove currentTabModule HTML parent-element content
+        $(_this.parentElement).children("*").unbind();
+        $(_this.currentTabModule.parentElement).find('.module_container').remove();
+
+        // remove currentTabModule refferences
         _this.currentTabModule.remove();
+        app.removeObject(_this.currentTabModule);
 
+        // hide last active modules (remove .active css class)
+        $(_this.parentElement).find('.active').removeClass('active');
+        // remove all imported module containers
+        $(_this.parentElement).find('.module_container').remove();
 
+        // save clicked label tab-index
         _this.activeTabIndex = $(label).attr('moduleindex');
+        // generate new module
         _this.createTabChildren();
-        _this.currentTabModule.render();
+        // show generated module HTML (add .active css class)
         $(_this.parentElement).children('div.tab[guid=' + _this.currentTabModule.guid + ']').addClass('active');
         $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').addClass('active');
-
     };
 
     TabsModule.prototype.createTabChildren = function() {
         var _this = this;
 
-        var module = app.moduleFactory(_this.tabChildren[_this.activeTabIndex]);
-
-        _this.currentTabModule = module;
+        // create module 
+        var moduleParentElement = _this.tabChildren[_this.activeTabIndex];
+        _this.currentTabModule = app.moduleFactory(moduleParentElement);
     };
 
     TabsModule.prototype.remove = function() {
         var _this = this;
+
+        // remove labels from DOM
         $(_this.parentElement).find('.tab_labels_container').remove();
-        $(_this.parentElement).children('div[module]').not('div[module="tabs"]').html('');
+        // remove modules content
+        $(_this.parentElement).find('.module_container').remove();
+        // remove guid from parent container
+        $(_this.parentElement).removeAttr('guid');
+
+        // remove app.modules tabs-container and module tabs references
         app.modules[_this.guid] = null;
         delete app.modules[_this.guid];
+        app.modules[_this.currentTabModule.guid] = null;
+        delete app.modules[_this.currentTabModule.guid];
     };
 
     return TabsModule;

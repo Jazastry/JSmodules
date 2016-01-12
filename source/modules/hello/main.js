@@ -1,10 +1,10 @@
 var HelloModule = (function() {
 	function HelloModule (parentElement) {
-		Module.call(this, parentElement);
+		BroadcastModule.call(this, parentElement);
 	}
 
-	// extend base Module function
-	HelloModule.prototype = $.extend( true, InteractiveModule.prototype, Module.prototype);
+	// extend base Module prototype
+	HelloModule.prototype = $.extend( true, HelloModule.prototype, BroadcastModule.prototype);
 
 	return HelloModule;
 }());
