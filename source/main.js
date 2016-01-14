@@ -1,26 +1,11 @@
 var Module = (function() {
     function Module(parentElement) {
         this.name = $(parentElement).attr('module');
-        this.guid = app.guid();
         this.path = './modules/' + this.name + '/';
         this.parentElement = parentElement;
+        this.loadCss();
 
-        this.addDependencies();
     }
-
-    Module.prototype.addDependencies = function() {
-        var _this = this;
-
-        _this.attachGuidToParentElement();
-        _this.loadCss();
-    };
-
-    // attach guid attribute to parent element
-    Module.prototype.attachGuidToParentElement = function() {
-        var _this = this;
-
-        $(_this.parentElement).attr('guid', _this.guid);
-    };
 
     // load module css
     Module.prototype.loadCss = function() {
@@ -48,14 +33,11 @@ var Module = (function() {
 
     Module.prototype.remove = function() {
         var _this = this;
+        $(_this.parentElement).unbind();
+        $(_this.parentElement).remove();
         $(_this.parentElement).find("*").addBack().unbind();
-        $(_this.parentElement).find('.module_container').remove();
-        $(_this.parentElement).html('');
-        $(_this.parentElement).removeAttr('guid');
+        $(_this.parentElement).find("*").addBack().remove();
 
-        app.removeObject(app.modules[_this.guid]);
-        app.modules[_this.guid] = null;
-        delete app.modules[_this.guid];
         app.removeObject(_this);
         app.removeObject(this);
     };
@@ -64,9 +46,9 @@ var Module = (function() {
 }());
 
 var BroadcastModule = (function() {
-    function BroadcastModule(parentElement) {
+    function BroadcastModule(parentElement, infoChannel) {
         Module.call(this, parentElement);
-        this.channel = 'infoChannelA';        
+        this.infoChannel = infoChannel ? infoChannel : 'info_channel_A';    
         this.render();
     }
 
@@ -78,33 +60,40 @@ var BroadcastModule = (function() {
 
         // register broadcast 
         $(_this.parentElement).find('.broadcast_button').on('click', function(e) {
+            var channel = _this.infoChannel;
             var val = $(_this.parentElement).find('.info_input').val();
-            app.infoChannelService.broadcast(_this.channel, val, _this.guid);
+            $('body').trigger(channel, [val]);
         });
     };
 
     BroadcastModule.prototype.loadModule = function() {
         var _this = this;
+        var channel = _this.infoChannel;
+
+        // load chanel name
+        $(_this.parentElement).find('.channel_name > span').html(channel);
+        $(_this.parentElement).find('.broadcast_button').attr('broadcast-channel', channel);
 
         // register module to info-channel 
-        app.infoChannelService.connect(_this.channel, _this.guid, function(info){
-            // visualize info callback
-            $(_this.parentElement).find('.info_input').val(info);
+        $('body').on(channel, function(e, message){
+            $(_this.parentElement).find('.info_input').val(message);
         });
 
-        $(_this.parentElement).find('.info_input').val(app.infoChannelService.getInfo(_this.channel));        
+        _this.clickEvents();
+        
+        // load current info
+        $(_this.parentElement).find('.info_input').val($('#'+channel+'>input').val());
     };
 
     BroadcastModule.prototype.remove = function() {
         var _this = this;
-        app.infoChannelService.disconnect(_this.channel, _this.guid);
+        // app.infoChannelService.disconnect(_this.channel, _this.guid);
         Module.prototype.remove.call(this);
     };
 
     BroadcastModule.prototype.render = function(){
         var _this = this;
-        Module.prototype.render.call(this, function(){
-            _this.clickEvents();
+        Module.prototype.render.call(this, function(){            
             _this.loadModule();
         });
     };
@@ -113,20 +102,11 @@ var BroadcastModule = (function() {
 }());
 
 var app = app || {};
-app.modules = {};
-
-// creates unique guid value
-app.guid = function() {
-    function s4() {
-        return Math.floor((1 + Math.random()) * 0x10000)
-            .toString(16)
-            .substring(1);
-    }
-    return s4() + '-' + s4() + '-' + s4();
-};
+// app.modules = {};
 
 // factory for registered modules
 app.moduleFactory = function(moduleParentElement) {
+console.log('moduleParentElement ' , moduleParentElement);
     var module = {};
     var moduleName = $(moduleParentElement).attr('module');
     var modulePath = './modules/' + moduleName + '/';
@@ -150,11 +130,21 @@ app.moduleFactory = function(moduleParentElement) {
         case 'tabs':
             module = new TabsModule(moduleParentElement);
             break;
+        case 'tabs_child_a':
+            module = new TabsModule(moduleParentElement);
+            break;
+        case 'tabs_child_b':
+            module = new TabsModule(moduleParentElement);
+            break;
+        case 'monitoring_tabs':
+            module = new MonitoringTabsModule(moduleParentElement); //select_module_dialog
+            break;
+        default:
+            throw new Error('Module Factory - Not implemented module: ' + moduleName);
     }
 
     // register module
-    app.modules[module.guid] = module;
-    console.log('module ' , module);
+    // app.modules[module.parentElement] = module;
     return module;
 };
 

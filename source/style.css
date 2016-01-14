@@ -21,6 +21,16 @@ body {
     border: 1px solid #FFF;
     border-radius: 6px;
 }
+
+.default_square_button {
+    background-color: #000;
+    border: 1px solid #FFF;
+    border-radius: 6px;
+    padding: 1px 1px 6px 6px;
+    font-size: 43px;
+    line-height: 11px;
+}
+
 .default_input {
     color: #000;
     border-radius: 6px;
@@ -47,9 +57,11 @@ body {
 
 .tabs_container > .tab_labels_container > .tab_label {
     display: inline-block;
-    width: 100px;
+    min-width: 100px;
     height: 28px;
     line-height: 23px;
+    padding-left: 13px;
+    padding-right: 13px;
     border: 2px solid #FFF;
     border-top-left-radius: 7px;
     border-top-right-radius: 7px;

@@ -1,5 +1,5 @@
-var TabsModule = (function() {
-    function TabsModule(parentElement) {
+var TabsModuleA = (function() {
+    function TabsModuleA(parentElement) {
         Module.call(this, parentElement);
 
         this.currentTabModule = {};
@@ -9,10 +9,10 @@ var TabsModule = (function() {
     }
 
     // extend base Module prototype
-    TabsModule.prototype = $.extend(true, TabsModule.prototype, Module.prototype);
+    TabsModuleA.prototype = $.extend(true, TabsModuleA.prototype, Module.prototype);
 
     // override Module render function
-    TabsModule.prototype.render = function() {
+    TabsModuleA.prototype.render = function() {
         var _this = this;
 
         // load module HTML
@@ -26,7 +26,7 @@ var TabsModule = (function() {
         });
     };
 
-    TabsModule.prototype.createPrependTabLabels = function() {
+    TabsModuleA.prototype.createPrependTabLabels = function() {
         var _this = this;
 
         // add parent tab-container guid to parent labels-container
@@ -54,7 +54,7 @@ var TabsModule = (function() {
     };
 
     // called on label click
-    TabsModule.prototype.changeTab = function(label) {
+    TabsModuleA.prototype.changeTab = function(label) {
         var _this = this;
 
         // remove currentTabModule HTML parent-element content
@@ -78,25 +78,17 @@ var TabsModule = (function() {
         _this.showCurrentModuleAndLabel()
     };
 
-    TabsModule.prototype.createAppendTabChildrenModule = function() {
+    TabsModuleA.prototype.createAppendTabChildrenModule = function() {
         var _this = this;
 
         // create module 
         var moduleParentElement = $(_this.tabChildren[_this.activeTabIndex]).clone();
-        console.log('moduleParentElement ' , moduleParentElement);
-
         _this.currentTabModule = app.moduleFactory(moduleParentElement);
-        console.log('_this.currentTabModule ' , _this.currentTabModule);
-
         $(_this.parentElement).append(_this.currentTabModule.parentElement);
     };
 
-    TabsModule.prototype.remove = function() {
+    TabsModuleA.prototype.remove = function() {
         var _this = this;
-
-        // remove currentTabModule refferences
-        _this.currentTabModule.remove();
-        app.removeObject(_this.currentTabModule);
 
         // remove labels from DOM
         $(_this.parentElement).find('.tab_labels_container').remove();
@@ -105,16 +97,17 @@ var TabsModule = (function() {
         // remove guid from parent container
         $(_this.parentElement).removeAttr('guid');
 
+        // remove app.modules tabs-container and module tabs references
         app.removeObject(this);
         app.removeObject(_this)
     };
 
-    TabsModule.prototype.showCurrentModuleAndLabel = function() {
+    TabsModuleA.prototype.showCurrentModuleAndLabel = function() {
         var _this = this;
 
         $(_this.parentElement).children(_this.currentTabModule.parentElement).addClass('active');
         $(_this.parentElement).find('.tab_label[moduleindex="' + _this.activeTabIndex + '"]').addClass('active');
     };
 
-    return TabsModule;
+    return TabsModuleA;
 }());

@@ -6,6 +6,11 @@ app.infoChannelService = (function(){
 				'name': 'infoChannelA',
 				'listeners': {},
 				'info': ''
+			},
+			'infoChannelB': {
+				'name': 'infoChannelB',
+				'listeners': {},
+				'info': ''
 			}
 		};
 	}
