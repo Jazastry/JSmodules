@@ -1,25 +1,36 @@
 var TabsModule = (function() {
     function TabsModule(parentElement) {
-        Module.call(this, parentElement);
-
+        this.name = $(parentElement).attr('module');
+        this.path = './modules/' + this.name + '/';
+        this.parentElement = parentElement;        
         this.currentTabModule = {};
         this.activeTabIndex = 0;
+        // save tab-children parent div without inner HTML
         this.tabChildren = [];
+        this.loadCss();
         this.render();
     }
 
-    // extend base Module prototype
-    TabsModule.prototype = $.extend(true, TabsModule.prototype, Module.prototype);
+    TabsModule.prototype.loadCss = function() {
+        var _this = this;
 
-    // override Module render function
+        // loads css if is not loaded
+        if ($('head>link[href="' + _this.path + 'style.css"]').length <= 0) {
+            $("<link/>", {
+                rel: "stylesheet",
+                type: "text/css",
+                href: _this.path + 'style.css'
+            }).appendTo("head");
+        }
+    };
+
     TabsModule.prototype.render = function() {
         var _this = this;
 
         // load module HTML
         $.get(_this.path + 'index.html', function(moduleHtml) {
             _this.tabLabelContainer = $(moduleHtml).children('.tab_labels_container');
-            _this.tabChildren = $(moduleHtml).children('div[module]');
-            
+            _this.tabChildren = $(moduleHtml).children('div[module]');            
             _this.createAppendTabChildrenModule();            
             _this.createPrependTabLabels();
             _this.showCurrentModuleAndLabel();
@@ -63,7 +74,7 @@ var TabsModule = (function() {
 
         // remove currentTabModule refferences
         _this.currentTabModule.remove();
-        app.removeObject(_this.currentTabModule);
+        removeObject(_this.currentTabModule);
 
         // hide last active modules (remove .active css class)
         $(_this.parentElement).find('.active').removeClass('active');
@@ -75,7 +86,7 @@ var TabsModule = (function() {
         // generate new module
         _this.createAppendTabChildrenModule();
 
-        _this.showCurrentModuleAndLabel()
+        _this.showCurrentModuleAndLabel();
     };
 
     TabsModule.prototype.createAppendTabChildrenModule = function() {
@@ -83,11 +94,7 @@ var TabsModule = (function() {
 
         // create module 
         var moduleParentElement = $(_this.tabChildren[_this.activeTabIndex]).clone();
-        console.log('moduleParentElement ' , moduleParentElement);
-
-        _this.currentTabModule = app.moduleFactory(moduleParentElement);
-        console.log('_this.currentTabModule ' , _this.currentTabModule);
-
+        _this.currentTabModule = moduleFactory(moduleParentElement);
         $(_this.parentElement).append(_this.currentTabModule.parentElement);
     };
 
@@ -96,7 +103,7 @@ var TabsModule = (function() {
 
         // remove currentTabModule refferences
         _this.currentTabModule.remove();
-        app.removeObject(_this.currentTabModule);
+        removeObject(_this.currentTabModule);
 
         // remove labels from DOM
         $(_this.parentElement).find('.tab_labels_container').remove();
@@ -105,8 +112,8 @@ var TabsModule = (function() {
         // remove guid from parent container
         $(_this.parentElement).removeAttr('guid');
 
-        app.removeObject(this);
-        app.removeObject(_this)
+        removeObject(this);
+        removeObject(_this);
     };
 
     TabsModule.prototype.showCurrentModuleAndLabel = function() {

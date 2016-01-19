@@ -1,5 +1,6 @@
 @import url('./lib/node_modules/bootstrap/dist/css/bootstrap.css');
 @import url('./lib/bootstrap-xl/bootstrap-xl.css');
+
 body {
     background-color: #000;
     color: #FFF;
@@ -90,9 +91,4 @@ body {
     border: 2px solid #FFF;
     border-radius: 7px;
     background-color: #000;
-}
-
-/* interactive_module */
-.interactive_module {
-    margin-bottom: 20px;
 }

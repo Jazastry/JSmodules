@@ -1,39 +1,51 @@
-var app = app || {};
-app.infoChannelService = (function(){
+var infoChannelService = (function(){
 	function InfoChannelService () {
 		this.channels = {
-			'infoChannelA': {
-				'name': 'infoChannelA',
-				'listeners': {},
+			'info_channel_A': {
+				'name': 'info_channel_A',
+				'listeners': [],
 				'info': ''
 			},
-			'infoChannelB': {
-				'name': 'infoChannelB',
-				'listeners': {},
+			'info_channel_B': {
+				'name': 'info_channel_B',
+				'listeners': [],
+				'info': ''
+			},
+			'info_channel_C': {
+				'name': 'info_channel_C',
+				'listeners': [],
 				'info': ''
 			}
 		};
 	}
 
-	InfoChannelService.prototype.connect = function(chanelName, id, callback) {
+	InfoChannelService.prototype.connect = function(chanelName, listener, callback) {
 		var _this = this;
-		_this.channels[chanelName].listeners[id] = callback;
+		var listenerObj = {'listener': listener, 'callback': callback};
+
+		_this.channels[chanelName].listeners.push(listenerObj);
 	};
 
-	InfoChannelService.prototype.disconnect = function(chanelName, id) {
+	InfoChannelService.prototype.disconnect = function(chanelName, listener) {
 		var _this = this;
+		var listeners =_this.channels[chanelName].listeners;
 
-		_this.channels[chanelName].listeners[id] = null;
-		delete _this.channels[chanelName].listeners[id];
+		for (var i = 0; i < listeners.length; i++) {
+			if( listeners[ i ].listener === listener ) {
+		    listeners.splice( i, 1 );
+		    return true;
+		  }
+		}		 
+		
+		return false;
 	};
 
-	InfoChannelService.prototype.broadcast = function(chanelName, info, id) {
+	InfoChannelService.prototype.broadcast = function(chanelName, info) {
 		var _this = this;
 		var listeners = _this.channels[chanelName].listeners;
-		for(var key in listeners) {
-			if (key !== id) {
-				listeners[key](info);
-			}			
+		
+		for (var i = 0; i < listeners.length; i++) {
+			listeners[i].callback(info, chanelName);
 		}
 
 		_this.channels[chanelName].info = info;	
